@@ -68,7 +68,7 @@
         app:hintAnimationEnabled="true"
         app:expandedHintEnabled="true">
 
-        <com.google.android.material.textfield.TextInputEditText
+        <com.koaladev.storryapp.ui.custom.MyEditTextEmail
             android:id="@+id/emailEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -91,15 +91,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/emailEditTextLayout"
-        app:passwordToggleEnabled="true"
         app:passwordToggleTint="?attr/colorPrimary"
         app:startIconDrawable="@drawable/ic_baseline_lock_24"
         app:startIconTint="?attr/colorPrimary"
         app:hintEnabled="true"
         app:hintAnimationEnabled="true"
-        app:expandedHintEnabled="true" >
+        app:expandedHintEnabled="true">
 
-        <com.google.android.material.textfield.TextInputEditText
+        <com.koaladev.storryapp.ui.custom.MyEditTextPassword
             android:id="@+id/passwordEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

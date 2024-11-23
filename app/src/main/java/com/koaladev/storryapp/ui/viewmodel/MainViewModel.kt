@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.koaladev.storryapp.data.UserRepository
+import com.koaladev.storryapp.data.repository.UserRepository
 import com.koaladev.storryapp.data.pref.UserModel
 import kotlinx.coroutines.launch
 

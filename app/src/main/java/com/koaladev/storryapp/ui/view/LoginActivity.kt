@@ -2,6 +2,7 @@ package com.koaladev.storryapp.ui.view
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
@@ -10,6 +11,9 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.koaladev.storryapp.R
 import com.koaladev.storryapp.data.pref.UserModel
+import com.koaladev.storryapp.data.pref.UserPreference
+import com.koaladev.storryapp.data.pref.dataStore
+import com.koaladev.storryapp.data.repository.UserRepository
 import com.koaladev.storryapp.databinding.ActivityLoginBinding
 import com.koaladev.storryapp.ui.viewmodel.LoginViewModel
 import com.koaladev.storryapp.ui.viewmodel.ViewModelFactory
@@ -20,6 +24,9 @@ class LoginActivity : AppCompatActivity() {
     private val viewModel by viewModels<LoginViewModel> {
         ViewModelFactory.getInstance(this)
     }
+
+    private lateinit var repository: UserRepository
+    private lateinit var userPreference: UserPreference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,25 +40,28 @@ class LoginActivity : AppCompatActivity() {
             insets
         }
 
+        binding.passwordEditText.setAsPassword()
+
         setupAction()
     }
 
     private fun setupAction() {
         binding.loginButton.setOnClickListener {
             val email = binding.emailEditText.text.toString()
-            viewModel.saveSession(UserModel(email, "sample_token"))
-            AlertDialog.Builder(this).apply {
-                setTitle("Yeah!")
-                setMessage("Anda berhasil login. Sudah tidak sabar untuk belajar ya?")
-                setPositiveButton("Lanjut") { _, _ ->
-                    val intent = Intent(this@LoginActivity, MainActivity::class.java)
+            val password = binding.passwordEditText.text.toString()
+            viewModel.login(email, password) { isSuccess ->
+                if (isSuccess) {
+                    val user = UserModel(email, "sample_token", true)
+                    viewModel.saveSession(user)
+                    val intent = Intent(this, MainActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                     startActivity(intent)
                     finish()
+                } else {
+                    Toast.makeText(this, "Login gagal", Toast.LENGTH_SHORT).show()
                 }
-                create()
-                show()
             }
+
         }
     }
 }
