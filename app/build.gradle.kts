@@ -67,4 +67,5 @@ dependencies {
     implementation(libs.androidx.exifinterface)
     implementation(libs.glide)
     annotationProcessor(libs.compiler)
+    implementation(libs.ucrop)
 }

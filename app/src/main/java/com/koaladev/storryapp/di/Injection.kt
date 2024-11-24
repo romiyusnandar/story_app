@@ -5,6 +5,7 @@ import com.koaladev.storryapp.data.repository.UserRepository
 import com.koaladev.storryapp.data.repository.SignupRepository
 import com.koaladev.storryapp.data.pref.UserPreference
 import com.koaladev.storryapp.data.pref.dataStore
+import com.koaladev.storryapp.data.repository.StoryRepository
 import com.koaladev.storryapp.data.retrofit.ApiConfig
 
 object Injection {
@@ -16,5 +17,10 @@ object Injection {
     fun provideSignupRepository(context: Context): SignupRepository {
         val apiService = ApiConfig.getApiService()
         return SignupRepository.getInstance(apiService)
+    }
+
+    fun provideStoryRepository(context: Context): StoryRepository {
+        val apiService = ApiConfig.getApiService()
+        return StoryRepository.getInstance(apiService)
     }
 }
