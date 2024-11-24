@@ -55,9 +55,9 @@ class LoginActivity : AppCompatActivity() {
         binding.loginButton.setOnClickListener {
             val email = binding.emailEditText.text.toString()
             val password = binding.passwordEditText.text.toString()
-            viewModel.login(email, password) { isSuccess, userId, email, token ->
+            viewModel.login(email, password) { isSuccess, userId, name, email, token ->
                 if (isSuccess) {
-                    viewModel.saveSession(UserModel(userId, email, token, true))
+                    viewModel.saveSession(UserModel(userId, name, email, token, true))
                     val intent = Intent(this, MainActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                     startActivity(intent)

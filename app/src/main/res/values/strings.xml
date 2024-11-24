@@ -11,6 +11,7 @@
     <string name="title_login_page">Sudah siap untuk upgrade skill?</string>
     <string name="name">Nama</string>
     <string name="message_main_page">Selamat Belajar di Dicoding.</string>
-    <string name="greeting">Halo %1$s,</string>
     <string name="logout">Keluar</string>
+    <string name="welcome_username">Selamat datang %1s</string>
+    <string name="welcome_message">Selamat menggunakan aplikasi!</string>
 </resources>

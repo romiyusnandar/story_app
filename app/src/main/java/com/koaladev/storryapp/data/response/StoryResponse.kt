@@ -1,17 +1,32 @@
 package com.koaladev.storryapp.data.response
 
+import android.os.Parcelable
+import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
+
 data class StoryResponse(
-    val error: Boolean? = null,
-    val message: String? = null,
-    val listStory: List<ListStoryItem?>? = null
+    @SerializedName("error")
+    val error: Boolean,
+    @SerializedName("message")
+    val message: String,
+    @SerializedName("listStory")
+    val listStory: List<ListStoryItem>
 )
 
+@Parcelize
 data class ListStoryItem(
-    val id: String? = null,
-    val name: String? = null,
-    val description: String? = null,
-    val photoUrl: String? = null,
-    val createdAt: String? = null,
-    val lon: Any? = null,
-    val lat: Any? = null
-)
+    @SerializedName("id")
+    val id: String,
+    @SerializedName("name")
+    val name: String,
+    @SerializedName("description")
+    val description: String,
+    @SerializedName("photoUrl")
+    val photoUrl: String,
+    @SerializedName("createdAt")
+    val createdAt: String,
+    @SerializedName("lat")
+    val lat: Double?,
+    @SerializedName("lon")
+    val lon: Double?
+) : Parcelable
