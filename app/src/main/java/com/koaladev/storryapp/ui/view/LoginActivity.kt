@@ -14,6 +14,7 @@ import com.koaladev.storryapp.data.pref.UserModel
 import com.koaladev.storryapp.data.pref.UserPreference
 import com.koaladev.storryapp.data.pref.dataStore
 import com.koaladev.storryapp.data.repository.UserRepository
+import com.koaladev.storryapp.data.retrofit.ApiConfig
 import com.koaladev.storryapp.databinding.ActivityLoginBinding
 import com.koaladev.storryapp.ui.viewmodel.LoginViewModel
 import com.koaladev.storryapp.ui.viewmodel.ViewModelFactory
@@ -40,6 +41,11 @@ class LoginActivity : AppCompatActivity() {
             insets
         }
 
+        userPreference = UserPreference.getInstance(dataStore)
+        repository = UserRepository.getInstance(
+            UserPreference.getInstance(dataStore),
+            ApiConfig.getApiService()
+        )
         binding.passwordEditText.setAsPassword()
 
         setupAction()
@@ -49,10 +55,9 @@ class LoginActivity : AppCompatActivity() {
         binding.loginButton.setOnClickListener {
             val email = binding.emailEditText.text.toString()
             val password = binding.passwordEditText.text.toString()
-            viewModel.login(email, password) { isSuccess ->
+            viewModel.login(email, password) { isSuccess, userId, email, token ->
                 if (isSuccess) {
-                    val user = UserModel(email, "sample_token", true)
-                    viewModel.saveSession(user)
+                    viewModel.saveSession(UserModel(userId, email, token, true))
                     val intent = Intent(this, MainActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                     startActivity(intent)
@@ -61,7 +66,6 @@ class LoginActivity : AppCompatActivity() {
                     Toast.makeText(this, "Login gagal", Toast.LENGTH_SHORT).show()
                 }
             }
-
         }
     }
 }
