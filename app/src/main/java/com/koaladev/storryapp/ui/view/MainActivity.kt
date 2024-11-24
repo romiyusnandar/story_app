@@ -11,12 +11,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.koaladev.storryapp.R
 import com.koaladev.storryapp.adapter.StoryAdapter
 import com.koaladev.storryapp.databinding.ActivityMainBinding
 import com.koaladev.storryapp.ui.viewmodel.MainViewModel
 import com.koaladev.storryapp.ui.viewmodel.ViewModelFactory
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -35,21 +38,27 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, AddStoryActivity::class.java))
         }
 
+        lifecycleScope.launch {
+            delay(500)
+            checkUserSession()
+        }
+
+        setupAction()
+        setupRecyclerView()
+        observeViewModel()
+    }
+
+    private fun checkUserSession() {
         viewModel.getSession().observe(this) { user ->
             if (!user.isLogin) {
                 startActivity(Intent(this, WelcomeActivity::class.java))
                 finish()
             } else {
                 binding.tvGreeting.text = getString(R.string.welcome_username, user.name)
+                viewModel.getStories(false)
             }
         }
-
-        setupAction()
-        setupRecyclerView()
-        viewModel.getStories(false)
-        observeViewModel()
     }
-
     private fun setupRecyclerView() {
         adapter = StoryAdapter(emptyList()) { story ->
             val intent = Intent(this, DetailActivity::class.java).apply {
