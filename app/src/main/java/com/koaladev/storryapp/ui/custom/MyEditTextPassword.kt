@@ -19,7 +19,7 @@ class MyEditTextPassword @JvmOverloads constructor(
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                // Do nothing
+                // No action
             }
 
             override fun afterTextChanged(s: Editable?) {

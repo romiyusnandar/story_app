@@ -14,4 +14,10 @@
     <string name="logout">Keluar</string>
     <string name="welcome_username">Selamat datang %1s</string>
     <string name="welcome_message">Selamat menggunakan aplikasi!</string>
+    <string name="preview_image">preview image</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Gallery</string>
+    <string name="description">Deskripsi</string>
+    <string name="upload">Upload</string>
+    <string name="story_image">Story Image</string>
 </resources>

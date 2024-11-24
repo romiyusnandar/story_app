@@ -15,11 +15,11 @@ class MyEditTextEmail @JvmOverloads constructor(
     init {
         addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                // Do nothing
+                // No action
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                // Do nothing
+                // No action
             }
 
             override fun afterTextChanged(s: Editable?) {
