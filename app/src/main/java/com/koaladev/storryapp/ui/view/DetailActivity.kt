@@ -1,10 +1,8 @@
 package com.koaladev.storryapp.ui.view
 
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.google.android.material.appbar.MaterialToolbar
 import com.koaladev.storryapp.R
@@ -26,6 +24,7 @@ class DetailActivity : AppCompatActivity() {
 
         toolbar = binding.toolbar
         setSupportActionBar(toolbar)
+        toolbar.setNavigationIconTint(ContextCompat.getColor(this, R.color.md_theme_onPrimary))
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)

@@ -1,7 +1,6 @@
 package com.koaladev.storryapp.ui.view
 
 import android.Manifest
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -14,6 +13,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.google.android.material.appbar.MaterialToolbar
+import com.koaladev.storryapp.R
 import com.koaladev.storryapp.databinding.ActivityAddStoryBinding
 import com.koaladev.storryapp.ui.getImageUri
 import com.koaladev.storryapp.ui.viewmodel.AddStoryViewModel
@@ -21,13 +21,11 @@ import com.koaladev.storryapp.ui.viewmodel.ViewModelFactory
 import com.yalantis.ucrop.UCrop
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import java.io.FileOutputStream
 import java.io.ByteArrayOutputStream
-import java.util.*
 
 class AddStoryActivity : AppCompatActivity() {
 
@@ -79,6 +77,7 @@ class AddStoryActivity : AppCompatActivity() {
         toolbar = binding.toolbar
         setSupportActionBar(toolbar)
 
+        toolbar.setNavigationIconTint(ContextCompat.getColor(this, R.color.md_theme_onPrimary))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 

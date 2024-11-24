@@ -3,17 +3,10 @@ package com.koaladev.storryapp.ui.view
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
-import android.view.Gravity
 import android.view.View
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.koaladev.storryapp.R
 import com.koaladev.storryapp.databinding.ActivityWelcomeBinding
 
 class WelcomeActivity : AppCompatActivity() {

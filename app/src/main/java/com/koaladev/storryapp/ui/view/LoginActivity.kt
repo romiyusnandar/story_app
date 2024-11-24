@@ -11,7 +11,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.koaladev.storryapp.R
 import com.koaladev.storryapp.data.pref.UserModel
 import com.koaladev.storryapp.data.pref.UserPreference
 import com.koaladev.storryapp.data.pref.dataStore
