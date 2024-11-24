@@ -2,6 +2,8 @@ package com.koaladev.storryapp.ui.view
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -55,15 +57,26 @@ class LoginActivity : AppCompatActivity() {
         binding.loginButton.setOnClickListener {
             val email = binding.emailEditText.text.toString()
             val password = binding.passwordEditText.text.toString()
-            viewModel.login(email, password) { isSuccess, userId, name, email, token ->
+            viewModel.login(email, password) { isSuccess, userId, name, email, token, msg ->
+                binding.loginButton.startLoading()
                 if (isSuccess) {
-                    viewModel.saveSession(UserModel(userId, name, email, token, true))
-                    val intent = Intent(this, MainActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-                    startActivity(intent)
-                    finish()
+                    binding.loginButton.doResult(true)
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        viewModel.saveSession(UserModel(userId, name, email, token, true))
+                        val intent = Intent(this, MainActivity::class.java)
+                        Toast.makeText(this, "Login berhasil!", Toast.LENGTH_SHORT).show()
+                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                        startActivity(intent)
+                        finish()
+                    }, 900)
                 } else {
-                    Toast.makeText(this, "Login gagal", Toast.LENGTH_SHORT).show()
+                    binding.loginButton.doResult(false)
+                    AlertDialog.Builder(this)
+                    .setTitle("Ooops!")
+                    .setMessage(msg + "\nCoba cek kembali email dan password anda.")
+                    .setPositiveButton("Coba lagi", null)
+                    .create()
+                    .show()
                 }
             }
         }

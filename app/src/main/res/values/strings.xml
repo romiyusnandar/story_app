@@ -7,8 +7,8 @@
     <string name="title_signup_page">Lengkapi data dirimu ya!</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
-    <string name="message_login_page">Masukkan dulu datamu ya</string>
-    <string name="title_login_page">Sudah siap untuk upgrade skill?</string>
+    <string name="message_login_page">Login terlebih dahulu ya!</string>
+    <string name="title_login_page">Sudah siap untuk menceritakan kisahmu?</string>
     <string name="name">Nama</string>
     <string name="message_main_page">Selamat Belajar di Dicoding.</string>
     <string name="logout">Keluar</string>

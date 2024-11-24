@@ -40,17 +40,27 @@ class SignupActivity : AppCompatActivity() {
             val name = binding.nameEditText.text.toString()
             val email = binding.emailEditText.text.toString()
             val password = binding.passwordEditText.text.toString()
-            Log.d("SignupActivity", "setupAction: $name, $email, $password")
 
             if (name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
-                viewModel.signup(name, email, password) { isSuccess ->
+                viewModel.signup(name, email, password) { isSuccess, msg ->
+                    binding.signupButton.startLoading()
                     if (isSuccess) {
+                        binding.signupButton.doResult(true)
                         AlertDialog.Builder(this).apply {
                             setTitle("Yeah!")
-                            setMessage("Akun dengan $email sudah jadi nih. Yuk, login dan belajar coding.")
+                            setMessage("Akun untuk $email sudah jadi nih. Yuk, login sekarang.")
                             setPositiveButton("Lanjut") { _, _ ->
                                 finish()
                             }
+                            create()
+                            show()
+                        }
+                    } else {
+                        binding.signupButton.doResult(false)
+                        AlertDialog.Builder(this).apply {
+                            setTitle("Oops!")
+                            setMessage(msg + ", coba gunakan akun lain " ?: "Terjadi kesalahan saat mendaftar")
+                            setPositiveButton("Ok", null)
                             create()
                             show()
                         }

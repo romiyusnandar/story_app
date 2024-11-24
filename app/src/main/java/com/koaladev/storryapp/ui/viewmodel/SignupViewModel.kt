@@ -11,18 +11,20 @@ class SignupViewModel (private val repository: SignupRepository) : ViewModel() {
         const val TAG = "SignupViewModel"
     }
 
-    fun signup(username: String, email: String, password: String, onResult: (Boolean) -> Unit) {
+    fun signup(name: String, email: String, password: String, onResult: (Boolean, String) -> Unit) {
         viewModelScope.launch {
             try {
-                val response = repository.register(username, email, password)
+                val response = repository.register(name, email, password)
                 if (response.error == true) {
-                    onResult(false)
+                    onResult(false, response.message ?: "Unknown error occurred")
+                    Log.d(TAG, "Signup failed: ${response.message}")
                 } else {
-                    onResult(true)
-                    Log.d(TAG, "registerUser: ${response.message}")
+                    onResult(true, "Signup successful")
+                    Log.d(TAG, "Signup successful: ${response.message}")
                 }
             } catch (e: Exception) {
-                onResult(false)
+
+                onResult(false, e.message.toString())
             }
         }
     }

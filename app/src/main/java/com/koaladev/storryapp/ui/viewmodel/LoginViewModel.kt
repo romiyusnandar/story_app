@@ -19,7 +19,7 @@ class LoginViewModel(private val repository: UserRepository) : ViewModel() {
     }
 
     fun login(
-        email: String, password: String, onResult: (Boolean, String, String, String, String) -> Unit) {
+        email: String, password: String, onResult: (Boolean, String, String, String, String, String) -> Unit) {
         Log.d(TAG, "Melakukan login untuk: $email")
         viewModelScope.launch {
             try {
@@ -33,18 +33,19 @@ class LoginViewModel(private val repository: UserRepository) : ViewModel() {
                             loginResult.userId.toString(),
                             loginResult.name.toString(),
                             email,
-                            loginResult.token.toString()
+                            loginResult.token.toString(),
+                            response.message.toString()
                         )
                     } else {
                         Log.e(TAG, "Login failed: Login result is null")
-                        onResult(false, "", "", "", "")
+                        onResult(false, "", "", "", "", response.message.toString())
                     }
                 } else {
                     Log.e(TAG, "Login failed: ${response.message}")
-                    onResult(false, "", "", "", "")
+                    onResult(false, "", "", "", "", response.message.toString())
                 }
             } catch (e: Exception) {
-                onResult(false, "", "", "", "")
+                onResult(false, "", "", "", "", e.message.toString())
                 Log.e(TAG, "login: ${e.message}")
             }
         }
