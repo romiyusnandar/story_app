@@ -72,4 +72,6 @@ dependencies {
     implementation(libs.ucrop)
     implementation(libs.ktloadingbutton)
     implementation(libs.play.services.location)
+    implementation(libs.androidx.paging.common.android)
+    implementation(libs.androidx.paging.runtime.ktx)
 }

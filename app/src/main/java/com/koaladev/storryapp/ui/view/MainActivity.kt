@@ -6,10 +6,13 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.koaladev.storryapp.R
 import com.koaladev.storryapp.adapter.StoryAdapter
@@ -17,7 +20,9 @@ import com.koaladev.storryapp.databinding.ActivityMainBinding
 import com.koaladev.storryapp.ui.viewmodel.MainViewModel
 import com.koaladev.storryapp.ui.viewmodel.ViewModelFactory
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import com.koaladev.storryapp.adapter.LoadingStateAdapter
 
 class MainActivity : AppCompatActivity() {
 
@@ -47,7 +52,6 @@ class MainActivity : AppCompatActivity() {
 
         setupAction()
         setupRecyclerView()
-        observeViewModel()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -75,37 +79,48 @@ class MainActivity : AppCompatActivity() {
                 finish()
             } else {
                 binding.tvGreeting.text = getString(R.string.welcome_username, user.name)
-                viewModel.getStories(true)
+                observeViewModel(user.token)
             }
         }
     }
+
     private fun setupRecyclerView() {
-        adapter = StoryAdapter(emptyList()) { story ->
+        adapter = StoryAdapter { story ->
             val intent = Intent(this, DetailActivity::class.java).apply {
                 putExtra(DetailActivity.EXTRA_STORY, story)
             }
             startActivity(intent)
         }
+
+        val viewPool = RecyclerView.RecycledViewPool()
         binding.rvStory.apply {
-            this.adapter = adapter
             layoutManager = LinearLayoutManager(this@MainActivity)
+            setRecycledViewPool(viewPool)
+            adapter = this@MainActivity.adapter.withLoadStateFooter(
+                footer = LoadingStateAdapter {
+                    this@MainActivity.adapter.retry()
+                }
+            )
+        }
+
+        adapter.addLoadStateListener { loadState ->
+            when (loadState.refresh) {
+                is LoadState.Loading -> showLoading(true)
+                is LoadState.NotLoading -> showLoading(false)
+                is LoadState.Error -> {
+                    showLoading(false)
+                    val error = loadState.refresh as LoadState.Error
+                    Toast.makeText(this, "Error: ${error.error.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 
-    private fun observeViewModel() {
-        viewModel.stories.observe(this) { stories ->
-            adapter = stories?.let {
-                StoryAdapter(it) { story ->
-                    val intent = Intent(this, DetailActivity::class.java).apply {
-                        putExtra(DetailActivity.EXTRA_STORY, story)
-                    }
-                    startActivity(intent)
+    private fun observeViewModel(token: String) {
+        lifecycleScope.launchWhenCreated {
+            viewModel.getPageStories(token).collectLatest { pagingData ->
+                adapter.submitData(pagingData)
             }
-        }!!
-            binding.rvStory.adapter = adapter
-        }
-        viewModel.isLoading.observe(this) { isLoading ->
-            showLoading(isLoading)
         }
     }
 

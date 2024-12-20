@@ -38,6 +38,14 @@ interface ApiServices {
         @Query("location") location: String
     ): Call<StoryResponse>
 
+    @GET("stories")
+    suspend fun getStories(
+        @Header("Authorization") token: String,
+        @Query("page") page: Int = 1,
+        @Query("size") size: Int = 20
+    ): StoryResponse
+
+
     @Multipart
     @POST("stories")
     suspend fun addStory(

@@ -6,11 +6,19 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.koaladev.storryapp.data.repository.UserRepository
 import com.koaladev.storryapp.data.pref.UserModel
+import com.koaladev.storryapp.data.repository.StoryPagingSource
 import com.koaladev.storryapp.data.response.ListStoryItem
 import com.koaladev.storryapp.data.response.StoryResponse
 import com.koaladev.storryapp.data.retrofit.ApiConfig
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -32,6 +40,18 @@ class MainViewModel(private val repository: UserRepository) : ViewModel() {
             repository.logout()
         }
     }
+
+    @OptIn(FlowPreview::class)
+    fun getPageStories(token: String) = Pager(
+        config = PagingConfig(
+            pageSize = StoryPagingSource.NETWORK_PAGE_SIZE,
+            maxSize = StoryPagingSource.NETWORK_PAGE_SIZE * 3,
+            prefetchDistance = 1,
+            enablePlaceholders = false,
+            initialLoadSize = StoryPagingSource.NETWORK_PAGE_SIZE
+        ),
+        pagingSourceFactory = { StoryPagingSource(ApiConfig.getApiService(), token) }
+    ).flow.cachedIn(viewModelScope).debounce(300)
 
     fun getStories(location: Boolean) {
         _isLoading.value = true
