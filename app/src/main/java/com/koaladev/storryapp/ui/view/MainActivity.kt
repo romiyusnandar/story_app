@@ -8,10 +8,12 @@ import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.appbar.MaterialToolbar
 import com.koaladev.storryapp.R
+import com.koaladev.storryapp.adapter.LoadingStateAdapter
 import com.koaladev.storryapp.adapter.StoryAdapter
 import com.koaladev.storryapp.databinding.ActivityMainBinding
 import com.koaladev.storryapp.ui.viewmodel.MainViewModel
@@ -75,34 +77,26 @@ class MainActivity : AppCompatActivity() {
                 finish()
             } else {
                 binding.tvGreeting.text = getString(R.string.welcome_username, user.name)
-                viewModel.getStories(true)
+                viewModel.getStories(user.token)
             }
         }
     }
     private fun setupRecyclerView() {
-        adapter = StoryAdapter(emptyList()) { story ->
-            val intent = Intent(this, DetailActivity::class.java).apply {
-                putExtra(DetailActivity.EXTRA_STORY, story)
-            }
-            startActivity(intent)
-        }
-        binding.rvStory.apply {
-            this.adapter = adapter
-            layoutManager = LinearLayoutManager(this@MainActivity)
+        adapter = StoryAdapter(
+            ::navigateToDetail
+        )
+
+        with(binding) {
+            rvStory.layoutManager = LinearLayoutManager(this@MainActivity)
+            rvStory.adapter = adapter.withLoadStateFooter(
+                footer = LoadingStateAdapter{ adapter.retry() }
+            )
         }
     }
 
     private fun observeViewModel() {
         viewModel.stories.observe(this) { stories ->
-            adapter = stories?.let {
-                StoryAdapter(it) { story ->
-                    val intent = Intent(this, DetailActivity::class.java).apply {
-                        putExtra(DetailActivity.EXTRA_STORY, story)
-                    }
-                    startActivity(intent)
-            }
-        }!!
-            binding.rvStory.adapter = adapter
+            adapter.submitData(lifecycle, stories)
         }
         viewModel.isLoading.observe(this) { isLoading ->
             showLoading(isLoading)
@@ -118,5 +112,12 @@ class MainActivity : AppCompatActivity() {
         binding.btnLogout.setOnClickListener {
             viewModel.logout()
         }
+    }
+
+    private fun navigateToDetail(id: String) {
+        val intent = Intent(this, DetailActivity::class.java).apply {
+            putExtra(DetailActivity.EXTRA_STORY_ID, id)
+        }
+        startActivity(intent)
     }
 }

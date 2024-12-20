@@ -15,6 +15,7 @@ class DetailActivity : AppCompatActivity() {
     private lateinit var toolbar: MaterialToolbar
     companion object {
         const val EXTRA_STORY = "extra_story"
+        const val EXTRA_STORY_ID = "extra_story_id"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

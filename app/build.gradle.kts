@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("kotlin-parcelize")
+    id("com.google.devtools.ksp")
     alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
 }
 
@@ -72,4 +73,8 @@ dependencies {
     implementation(libs.ucrop)
     implementation(libs.ktloadingbutton)
     implementation(libs.play.services.location)
+    implementation(libs.androidx.paging.runtime.ktx)
+    implementation(libs.androidx.room.paging)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.room.compiler)
 }
