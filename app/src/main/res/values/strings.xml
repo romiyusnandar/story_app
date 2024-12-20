@@ -20,4 +20,6 @@
     <string name="description">Deskripsi</string>
     <string name="upload">Upload</string>
     <string name="story_image">Story Image</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string name="maps_title">Maps</string>
 </resources>

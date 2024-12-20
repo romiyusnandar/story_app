@@ -2,11 +2,15 @@ package com.koaladev.storryapp.ui.view
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.appbar.MaterialToolbar
 import com.koaladev.storryapp.R
 import com.koaladev.storryapp.adapter.StoryAdapter
 import com.koaladev.storryapp.databinding.ActivityMainBinding
@@ -22,6 +26,7 @@ class MainActivity : AppCompatActivity() {
     private val viewModel by viewModels<MainViewModel> {
         ViewModelFactory.getInstance(this)
     }
+    private lateinit var toolbar: MaterialToolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,9 +42,30 @@ class MainActivity : AppCompatActivity() {
             checkUserSession()
         }
 
+        toolbar = binding.toolbar
+        setSupportActionBar(toolbar)
+
         setupAction()
         setupRecyclerView()
         observeViewModel()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.toolbar_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        Log.d("MainActivity", "Menu item clicked: ${item.itemId}")
+        return when (item.itemId) {
+            R.id.ic_map -> {
+                Log.d("MainActivity", "Maps menu item clicked")
+                val intent = Intent(this, MapsActivity::class.java)
+                startActivity(intent)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private fun checkUserSession() {
@@ -49,7 +75,7 @@ class MainActivity : AppCompatActivity() {
                 finish()
             } else {
                 binding.tvGreeting.text = getString(R.string.welcome_username, user.name)
-                viewModel.getStories(false)
+                viewModel.getStories(true)
             }
         }
     }
