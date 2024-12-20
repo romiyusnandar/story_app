@@ -6,48 +6,121 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.appbar.MaterialToolbar
 import com.koaladev.storryapp.R
-import com.koaladev.storryapp.adapter.StoryAdapter
+import com.koaladev.storryapp.adapter.StoryListAdapter
 import com.koaladev.storryapp.databinding.ActivityMainBinding
+import com.koaladev.storryapp.ui.LoadingStateAdapter
 import com.koaladev.storryapp.ui.viewmodel.MainViewModel
 import com.koaladev.storryapp.ui.viewmodel.ViewModelFactory
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.collectLatest
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var adapter: StoryAdapter
     private val viewModel by viewModels<MainViewModel> {
         ViewModelFactory.getInstance(this)
     }
-    private lateinit var toolbar: MaterialToolbar
+    private lateinit var storyAdapter: StoryListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        setupToolbar()
+        setupRecyclerView()
+        setupFabAction()
+        setupLogoutAction()
+        observeUserSession()
+    }
+
+    private fun setupToolbar() {
+        setSupportActionBar(binding.toolbar)
+    }
+
+    private fun setupRecyclerView() {
+        storyAdapter = StoryListAdapter()
+
+        binding.rvStory.apply {
+            adapter = ConcatAdapter(
+                storyAdapter.withLoadStateFooter(
+                    footer = LoadingStateAdapter { storyAdapter.retry() }
+                )
+            )
+            layoutManager = LinearLayoutManager(this@MainActivity).apply {
+                initialPrefetchItemCount = 5
+            }
+            itemAnimator = null
+
+        }
+
+        storyAdapter.addLoadStateListener { loadState ->
+            val isLoading = loadState.refresh is LoadState.Loading
+            showLoading(isLoading)
+            handleLoadStateError(loadState)
+        }
+    }
+
+    private fun setupFabAction() {
         binding.fabAdd.setOnClickListener {
             startActivity(Intent(this, AddStoryActivity::class.java))
         }
+    }
 
-        lifecycleScope.launch {
-            delay(500)
-            checkUserSession()
+    private fun setupLogoutAction() {
+        binding.btnLogout.setOnClickListener {
+            viewModel.logout()
         }
+    }
 
-        toolbar = binding.toolbar
-        setSupportActionBar(toolbar)
+    private fun observeUserSession() {
+        viewModel.getSession().observe(this) { user ->
+            if (user.isLogin) {
+                binding.tvGreeting.text = getString(R.string.welcome_username, user.name)
+                observeStories(user.token)
+            } else {
+                navigateToWelcomeScreen()
+            }
+        }
+    }
 
-        setupAction()
-        setupRecyclerView()
-        observeViewModel()
+    private fun observeStories(token: String) {
+        viewModel.getStories(token).observe(this) { pagingData ->
+            storyAdapter.submitData(lifecycle, pagingData)
+        }
+    }
+
+    private fun showLoading(isLoading: Boolean) {
+        binding.apply {
+            progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+            fabAdd.visibility = if (isLoading) View.GONE else View.VISIBLE
+        }
+    }
+
+    private fun handleLoadStateError(loadState: androidx.paging.CombinedLoadStates) {
+        val errorState = listOf(
+            loadState.source.append,
+            loadState.source.prepend,
+            loadState.append,
+            loadState.prepend
+        ).find { it is LoadState.Error } as? LoadState.Error
+
+        errorState?.let {
+            Toast.makeText(this, it.error.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun navigateToWelcomeScreen() {
+        startActivity(Intent(this, WelcomeActivity::class.java))
+        finish()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -56,67 +129,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        Log.d("MainActivity", "Menu item clicked: ${item.itemId}")
         return when (item.itemId) {
             R.id.ic_map -> {
-                Log.d("MainActivity", "Maps menu item clicked")
-                val intent = Intent(this, MapsActivity::class.java)
-                startActivity(intent)
+                startActivity(Intent(this, MapsActivity::class.java))
                 true
             }
             else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-    private fun checkUserSession() {
-        viewModel.getSession().observe(this) { user ->
-            if (!user.isLogin) {
-                startActivity(Intent(this, WelcomeActivity::class.java))
-                finish()
-            } else {
-                binding.tvGreeting.text = getString(R.string.welcome_username, user.name)
-                viewModel.getStories(true)
-            }
-        }
-    }
-    private fun setupRecyclerView() {
-        adapter = StoryAdapter(emptyList()) { story ->
-            val intent = Intent(this, DetailActivity::class.java).apply {
-                putExtra(DetailActivity.EXTRA_STORY, story)
-            }
-            startActivity(intent)
-        }
-        binding.rvStory.apply {
-            this.adapter = adapter
-            layoutManager = LinearLayoutManager(this@MainActivity)
-        }
-    }
-
-    private fun observeViewModel() {
-        viewModel.stories.observe(this) { stories ->
-            adapter = stories?.let {
-                StoryAdapter(it) { story ->
-                    val intent = Intent(this, DetailActivity::class.java).apply {
-                        putExtra(DetailActivity.EXTRA_STORY, story)
-                    }
-                    startActivity(intent)
-            }
-        }!!
-            binding.rvStory.adapter = adapter
-        }
-        viewModel.isLoading.observe(this) { isLoading ->
-            showLoading(isLoading)
-        }
-    }
-
-    private fun showLoading(isLoading: Boolean) {
-        binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
-        binding.fabAdd.visibility = if (isLoading) View.GONE else View.VISIBLE
-    }
-
-    private fun setupAction() {
-        binding.btnLogout.setOnClickListener {
-            viewModel.logout()
         }
     }
 }

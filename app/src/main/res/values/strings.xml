@@ -22,4 +22,6 @@
     <string name="story_image">Story Image</string>
     <string name="title_activity_maps">MapsActivity</string>
     <string name="maps_title">Maps</string>
+    <string name="author">Author:</string>
+    <string name="created_at">Created at:</string>
 </resources>

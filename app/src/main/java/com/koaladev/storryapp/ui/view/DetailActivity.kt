@@ -4,17 +4,19 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
-import com.google.android.material.appbar.MaterialToolbar
 import com.koaladev.storryapp.R
-import com.koaladev.storryapp.data.response.ListStoryItem
 import com.koaladev.storryapp.databinding.ActivityDetailBinding
 
 class DetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDetailBinding
-    private lateinit var toolbar: MaterialToolbar
+
     companion object {
-        const val EXTRA_STORY = "extra_story"
+        const val EXTRA_STORY_ID = "extra_story_id"
+        const val EXTRA_STORY_NAME = "extra_story_name"
+        const val EXTRA_STORY_DESCRIPTION = "extra_story_description"
+        const val EXTRA_STORY_PHOTO_URL = "extra_story_photo_url"
+        const val EXTRA_STORY_CREATED_AT = "extra_story_created_at"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,20 +24,27 @@ class DetailActivity : AppCompatActivity() {
         binding = ActivityDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        toolbar = binding.toolbar
-        setSupportActionBar(toolbar)
-        toolbar.setNavigationIconTint(ContextCompat.getColor(this, R.color.md_theme_onPrimary))
+        setupToolbar()
+        displayStoryDetails()
+    }
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
+    private fun setupToolbar() {
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            setDisplayShowHomeEnabled(true)
+        }
+        binding.toolbar.setNavigationIconTint(ContextCompat.getColor(this, R.color.md_theme_onPrimary))
+    }
 
-        val story = intent.getParcelableExtra<ListStoryItem>(EXTRA_STORY)
-        story?.let {
-            Glide.with(this)
-                .load(it.photoUrl)
-                .into(binding.ivStory)
-            binding.tvStoryName.text = it.name
-            binding.tvStoryDescription.text = it.description
+    private fun displayStoryDetails() {
+        intent.apply {
+            binding.tvAuthorName.text = getStringExtra(EXTRA_STORY_NAME)
+            binding.tvDescriptionDetails.text = getStringExtra(EXTRA_STORY_DESCRIPTION)
+            binding.tvCreatedAt.text = getStringExtra(EXTRA_STORY_CREATED_AT)
+            Glide.with(this@DetailActivity)
+                .load(getStringExtra(EXTRA_STORY_PHOTO_URL))
+                .into(binding.ivDetailsPhoto)
         }
     }
 

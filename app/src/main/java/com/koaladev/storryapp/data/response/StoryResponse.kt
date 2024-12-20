@@ -1,6 +1,8 @@
 package com.koaladev.storryapp.data.response
 
 import android.os.Parcelable
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 
@@ -14,8 +16,9 @@ data class StoryResponse(
 )
 
 @Parcelize
+@Entity(tableName = "story")
 data class ListStoryItem(
-    @SerializedName("id")
+    @PrimaryKey @SerializedName("id")
     val id: String,
     @SerializedName("name")
     val name: String,

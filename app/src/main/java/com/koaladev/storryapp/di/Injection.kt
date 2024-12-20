@@ -1,6 +1,7 @@
 package com.koaladev.storryapp.di
 
 import android.content.Context
+import com.koaladev.storryapp.data.local.StoryDatabase
 import com.koaladev.storryapp.data.repository.UserRepository
 import com.koaladev.storryapp.data.repository.SignupRepository
 import com.koaladev.storryapp.data.pref.UserPreference
@@ -21,6 +22,7 @@ object Injection {
 
     fun provideStoryRepository(context: Context): StoryRepository {
         val apiService = ApiConfig.getApiService()
-        return StoryRepository.getInstance(apiService)
+        val database = StoryDatabase.getDatabase(context)
+        return StoryRepository.getInstance(apiService, database)
     }
 }
