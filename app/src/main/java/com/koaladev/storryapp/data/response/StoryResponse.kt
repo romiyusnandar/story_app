@@ -8,7 +8,7 @@ import kotlinx.parcelize.Parcelize
 
 data class StoryResponse(
     @SerializedName("error")
-    val error: Boolean,
+    val error: String,
     @SerializedName("message")
     val message: String,
     @SerializedName("listStory")

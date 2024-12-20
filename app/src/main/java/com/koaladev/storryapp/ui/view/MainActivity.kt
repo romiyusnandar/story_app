@@ -21,6 +21,7 @@ import com.koaladev.storryapp.ui.LoadingStateAdapter
 import com.koaladev.storryapp.ui.viewmodel.MainViewModel
 import com.koaladev.storryapp.ui.viewmodel.ViewModelFactory
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -82,7 +83,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun observeUserSession() {
-        viewModel.getSession().observe(this) { user ->
+        viewModel.userSession.observe(this) { user ->
             if (user.isLogin) {
                 binding.tvGreeting.text = getString(R.string.welcome_username, user.name)
                 observeStories(user.token)
@@ -93,8 +94,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun observeStories(token: String) {
-        viewModel.getStories(token).observe(this) { pagingData ->
-            storyAdapter.submitData(lifecycle, pagingData)
+        lifecycleScope.launch {
+            viewModel.getStories(token).collectLatest {
+                storyAdapter.submitData(it)
+            }
         }
     }
 

@@ -3,7 +3,6 @@ package com.koaladev.storryapp.ui.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
@@ -15,11 +14,20 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class MainViewModel(private val repository: UserRepository, private val storyRepository: StoryRepository) : ViewModel() {
-    fun getSession(): LiveData<UserModel> {
-        return repository.getSession().asLiveData()
+    private val _userSession = MutableLiveData<UserModel>()
+    val userSession: LiveData<UserModel> = _userSession
+
+    init {
+        getSession()
     }
 
-    private lateinit var _stories: LiveData<PagingData<ListStoryItem>>
+    private fun getSession() {
+        viewModelScope.launch {
+            repository.getSession().collect { userModel ->
+                _userSession.value = userModel
+            }
+        }
+    }
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: MutableLiveData<Boolean> = _isLoading
@@ -30,11 +38,8 @@ class MainViewModel(private val repository: UserRepository, private val storyRep
         }
     }
 
-    fun getStories(token: String): LiveData<PagingData<ListStoryItem>> {
-        if (!::_stories.isInitialized) {
-            _stories = storyRepository.getStories(token).cachedIn(viewModelScope)
-        }
-        return _stories
+    fun getStories(token: String): Flow<PagingData<ListStoryItem>> {
+        return storyRepository.getStories(token).cachedIn(viewModelScope)
     }
 
 }

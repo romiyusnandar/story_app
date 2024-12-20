@@ -30,16 +30,17 @@ class StoryRepository(
     }
 
     @OptIn(ExperimentalPagingApi::class)
-    fun getStories(token: String): LiveData<PagingData<ListStoryItem>> {
+    fun getStories(token: String): Flow<PagingData<ListStoryItem>> {
         return Pager(
             config = PagingConfig(
-                pageSize = 5
+                pageSize = 10,
+                enablePlaceholders = false
             ),
             remoteMediator = StoryRemoteMediator(storyDatabase, apiService, token),
             pagingSourceFactory = {
                 StoryPagingSource(apiService, token)
             }
-        ).liveData
+        ).flow
     }
 
     companion object {
